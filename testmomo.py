@@ -51,7 +51,7 @@ def fractional_difference(series, d, thresh=0.01):
 
 def apply_frac_diff(df, d):
     """Apply fractional differencing to a dataframe of assets."""
-    return df.apply(lambda col: fractional_difference(col.dropna().values, d), axis=0)
+    return df.apply(lambda col: pd.Series(fractional_difference(col.dropna().values, d)), axis=0)
 
 def test_stationarity(series):
     """Perform the Augmented Dickey-Fuller (ADF) test."""
@@ -68,7 +68,7 @@ def find_optimal_d(df, d_values=np.linspace(0.1, 1.0, 10), threshold=0.05):
     """Find the best differencing parameter `d` for stationarity."""
     for d in d_values:
         frac_diff_df = apply_frac_diff(df, d)
-        p_values = frac_diff_df.apply(test_stationarity, axis=0)
+        p_values = frac_diff_df.apply(test_stationarity)
         if (p_values < threshold).all():
             return d
     return None  # No optimal `d` found
